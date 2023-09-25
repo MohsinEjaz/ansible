@@ -1,0 +1,80 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: install updates on Amazon
+    tags: always
+    dnf:
+      update_only: yes
+      update_cache: yes
+    when: ansible_distribution == "Amazon"
+
+  - name: install updates on Ubuntu
+    tags: always
+    apt:
+      upgrade: dist
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+
+- hosts: web_servers
+  become: true
+  tasks:
+
+  - name: install apache and php package on Ubuntu
+    tags: apache,ubuntu
+    apt:
+      name: 
+        - apache2
+        - libapache2-mod-php
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install apache and php package on Amazon
+    tags: https, amazon
+    dnf:
+      name: 
+        - httpd
+        - php
+      state: latest
+    when: ansible_distribution == "Amazon"
+
+  - name: copy default html for site
+    tags: apache,httpd,html
+    copy:
+      src: default.html
+      dest: /var/www/html/index.html
+      owner: root
+      group: root
+      mode: 0644
+
+
+- hosts: db_server
+  become: true
+  tasks:
+
+  - name: install mariadb on Ubuntu
+    tags: mariadb, ubuntu
+    apt:
+      name: mariadb-server
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install mariadb on Amazon
+    tags: mariadb, amazon
+    dnf:
+      name: mariadb105-server 
+      state: latest
+    when: ansible_distribution == "Amazon"
+
+- hosts: file_server
+  become: true
+  tasks:
+    
+    - name: Install Samba
+      tags: samba
+      package:
+        name: samba
+        state: latest

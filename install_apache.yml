@@ -1,22 +1,24 @@
 ---
 
-- name: Install apache2
-  hosts: all
+- hosts: all
   become: true
   tasks:
 
 
-  - name: upadate repo index
+  - name: install apache and php package
     apt:
-      update_cache=true
-
-  - name: install apache2 package
-    apt:
-      name: apache2
+      name: 
+        - apache2
+        - libapache2-mod-php
       state: latest
+      update_cache: true
+    when: ansible_distribution == "Ubuntu"
 
-  - name: add php support
-    apt:
-      name: libapache2-mod-php
+  - name: install apache and php package
+    dnf:
+      name: 
+        - httpd
+        - php
       state: latest
-   
+      update_cache: true
+    when: ansible_distribution == "Amazon"
