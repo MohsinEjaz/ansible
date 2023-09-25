@@ -1,0 +1,45 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: install updates on Amazon
+    tags: always
+    dnf:
+      update_only: yes
+      update_cache: yes
+    when: ansible_distribution == "Amazon"
+
+  - name: install updates on Ubuntu
+    tags: always
+    apt:
+      upgrade: dist
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: create mohsin user
+    tags: always
+    user:
+      name: mohsin
+      groups: root
+
+  - name: add ssh key mohsin
+    tags: always
+    authorized_key:
+      user: mohsin
+      key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDkvU14Lh96os8fqev9+JJai341gUWO5alE9m6YkztboyaIANy7HYiyL7VZmhg5xuU51CJtOrXmtUS6nIkJ/O8sw+yfdyr/wiLnuu+K6RVZGduWaSX+ZzFW0A9vkFGytCDZHOLlcorUDlapZf9fcDsU5hMcOOprcw8KfFAxmUyPqG5Bx0LusyMHRhTznyeC2ze87gvJrcBgWIqBa1Vh+35mz5WBgsUtlR5unr/ZhuM9fO9aBXN6h9EU/0c0LxnMIYCrkSMqa9SmiZQH1uXVWpNExhcln1s8wlDQc+zN1CClKm7yEO+gFp8UpV8IeXATcauB1G6D9UIlM/accjN37vbyudVpy7s117pvsee9LC39HuJt4p1YOVktQ8k7k+1RjMZW/C3tsOdT5+U9YW8p28C7xMwV8/VlZWCgkygTGTD0eQNfm7Pxrt/EN+BxGIc13y87+KwWvkdaQGCd95RXYS4BLTD0aGCbM0mZDOTxS+WGkRwXnBb5boGoWPaXA/IMwFk= ubuntu@ip-172-31-10-154"
+
+  - name: add sudoers file for mohsin
+    tags: always
+    copy:
+      src: sudoer_mohsin
+      dest: /etc/sudoers.d/mohsin
+      owner: root
+      group: root
+      mode: 0440
